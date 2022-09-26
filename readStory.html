@@ -1,0 +1,264 @@
+<?php
+session_start();
+    include("php/functions.php");
+    include("php/connection.php");
+
+$_SESSION;
+
+$user_data = check_login($conn);
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/readStory.css">
+
+    <script src="js/scripts.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+
+    <title>Read Story</title>
+</head>
+
+<body background="img/bg.jpg">
+    <?php 
+    if(isset($_GET['success']) && $_GET['success'] == 1 ){
+        echo "<script>alert('Story added to saved succesfully!');</script>";
+    }
+    ?>
+    <div class="top">
+
+        <input type="checkbox" id="toggle-btn">
+        <label for="toggle-btn" class="show-menu-btn"><i class="fas fa-bars"></i></label>
+
+        <div class="nav">
+
+            <div class="logo">
+                <a href="index.html"><img src="img/logo.png" alt="Logo"></a>
+            </div>
+
+            <ul class="navigation">
+
+                <?php
+                if(!isset($_SESSION['username'])) {
+        ?>
+                <li><a href="home.html"><i class="fas fa-house-damage"></i> Home </a></li>
+                <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Log In </a></li>
+                <li><a href="signup.html"><i class="fas fa-user-plus"></i> Sign-Up </a></li>
+                <li><a href="#"><i class="fas fa-question"></i> About </a></li>
+
+                <?php
+            }
+            else{
+        ?>
+                <li><a href="home.html"><i class="fas fa-house-damage"></i> Home </a></li>
+                <li><a href="profile.html?profile_url=<?php echo $user_data['profile_url'] ?>"><i
+                            class="fas fa-user"></i>
+                        <?php echo $user_data['username'] ?>
+                    </a></li>
+                <li><a href="stories.html"><i class="fas fa-book-open"></i> Stories </a></li>
+                <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Log-Out </a></li>
+                <?php
+            }
+        ?>
+
+
+                <label for="toggle-btn" class="hide-menu-btn"><i class="fas fa-times"></i></label>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="story-body" id="storybody">
+        <div class="favourite-button">
+            <form method="post" action="php/addToFavourite.php">
+                <?php
+                $storyURL = $_GET['url'];
+
+                $query = "SELECT story.* FROM story INNER JOIN user ON story.user_id = user.user_id WHERE story.url='$storyURL'";
+
+                $result = mysqli_query($conn, $query);
+
+                while ($row = mysqli_fetch_array($result)) {
+                    
+              
+                ?>
+                <input type="text" name="usrid" value="<?php echo $user_data['user_id']; ?>">
+                <input type="text" name="storyid" value="<?php echo $row['story_id']; ?>">
+                <input type="text" name="story_url" value="<?php echo $storyURL; ?>">
+                
+                <?php
+                }
+                 if(isset($_SESSION['username'])){
+                ?>
+                <button type="submit"> <i class="fas fa-heart"></i> </button>
+               
+                <?php 
+                 }else{
+                     ?>
+                <button type="button" id="favbtn" onclick="log_in_alert()"> <i class="fas fa-heart"></i> </button>  
+                    <?php
+                 }
+                 ?>
+            </form>
+
+        </div>
+        <?php
+        $storyURL = $_GET['url'];
+
+        $query = "SELECT story.*, user.username, user.profile_url FROM story INNER JOIN user ON story.user_id = user.user_id WHERE story.url='$storyURL'";
+
+        $result = mysqli_query($conn, $query);
+
+        while ($row = mysqli_fetch_array($result)) {
+            $nr = $row['nr_of_accesses'];
+            $storyid= $row['story_id'];
+
+            $nr = $nr + 1;
+    
+            $stmt = $conn->prepare("UPDATE story Set nr_of_accesses='$nr' WHERE story_id = '$storyid'");
+            $stmt->execute();
+            $stmt->close();
+
+        ?>
+        <div class="story-antet">
+            <div class="story-image">
+
+                <img id="coverImg" name="cover_image" src="/ProiectWeb2/<?php echo $row['image_url'] ?>"
+                    alt="cover-img">
+
+            </div>
+
+            <div class="story-details">
+
+                <div class="story-title">
+                    Title:
+                    <?php echo $row['title'] ?>
+                </div>
+
+                <div class="story-author">
+                    Author:
+                    <a href="profile.html?profile_url=<?php echo $row['profile_url'] ?>">
+                        <?php echo $row['username'];?>
+                    </a>
+                </div>
+
+                <div class="story-preview">
+
+                    Preview:
+                    <?php echo $row['preview'] ?>
+                </div>
+
+                <div class="story-date-and-number-of-views">
+
+                    <div class="story-date">
+                        Publication Date:
+                        <?php echo $row['publish_date'] ?>
+
+                    </div>
+
+                    <div class="story-number-of-views">
+                        <i class="fas fa-eye"></i>
+                        <?php echo $row['nr_of_accesses'] ?>
+                    </div>
+
+                </div>
+
+                <div class="story-genre">
+                    Genre:
+                    <?php echo $row['genre'] ?>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="read-block">
+            <?php echo $row['body']; ?>
+        </div>
+
+
+
+        <?php
+     }
+     ?>
+
+
+    </div>
+
+    <div class="comment-section">
+        Comment section
+
+        <?php
+        $storyURL = $_GET['url'];
+
+        $query = "SELECT user.first_name, user.last_name, story.title, comments_new.user_id, comments_new.comment_body, comments_new.comment_date FROM user INNER JOIN (story INNER JOIN comments_new ON story.story_id = comments_new.story_id) ON user.user_id = comments_new.user_id WHERE story.url = '$storyURL' ";
+
+        $result = mysqli_query($conn, $query);
+
+        if(mysqli_num_rows($result) > 0){
+
+            while ($roww = mysqli_fetch_array($result)) {
+
+        ?>
+        <div class="comment">
+            <div class="name-and-date">
+
+                <div class="comment-name">
+                    <a href="#">
+                        <?php echo $roww['first_name'] . " " . $roww['last_name'] ?>
+                    </a>
+                </div>
+
+                <div class="comment-date">
+                    <?php echo " at " . $roww['comment_date']; ?>
+                </div>
+
+            </div>
+
+            <div class="comment-body">
+                <?php echo $roww['comment_body'] ; ?>
+            </div>
+
+        </div>
+        <?php
+            } }
+        ?>
+
+    </div>
+
+    </div>
+
+
+
+    <div class="footer">
+        <div class="sociallinks">
+
+            <a href="#"><i class="fab fa-facebook-square" style="color: #3b5998;"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter" style="color: #00acee;"></i></a>
+
+        </div>
+
+        <ul>
+
+            <li><a href="#"> Terms </a></li>
+            <li><a href="#"> Privacy </a></li>
+            <li><a href="#"> Help </a></li>
+            <li><a href="#"> &copy 2021 </a></li>
+
+        </ul>
+
+    </div>
+
+
+</body>
+
+</html>

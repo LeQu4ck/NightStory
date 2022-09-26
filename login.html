@@ -1,0 +1,53 @@
+<?php
+session_start();
+    include("php/functions.php");
+    include("php/connection.php");
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/login.css">
+    <!-- <link rel="stylesheet" href="/css/mainpage.css"> -->
+    <title>Log-In</title>
+</head>
+
+<body background="img/bg.jpg">
+    <div class="backbtn">
+        <a href="index.html">Back</a>
+    </div>
+    <div class="loginwrapper">
+        <div class="login">
+            
+
+                <form class="login-form" method="post" action="php/login.php">
+                    
+                    <label for="uname"><b> Username </b></label>
+                    <input type="text" placeholder="Enter Username" name="username" required>
+
+                    <label for="psw"><b> Password </b></label>
+                    <input type="password" placeholder="Enter Password" name="pswrd" required>
+
+                    <button type="submit"> Login </button>
+
+                    <div class="rememberme">
+                        <input type="checkbox" checked="unchecked" name="remember">
+                        <label for="remember"> Remember username </label>
+                        <!-- <span class="spantext">Remember username</span> -->
+                    </div>
+                    
+                    <div class="signup">
+                        <a href="signup.html"> Don't have an account yet? Sign Up here!</a>
+                    </div>
+
+                </form>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

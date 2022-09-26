@@ -1,0 +1,238 @@
+<?php
+session_start();
+    include("php/functions.php");
+    include("php/connection.php");
+
+$_SESSION;
+
+$user_data = check_login($conn);
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+    <!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.9.0/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.9.0/slick/slick-theme.css"/> -->
+
+    <script src="js/scripts.js" type="text/javascript"></script>
+    <script src="js/slider.js" type="text/javascript"></script>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        
+    <scrip src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script> -->
+
+    <title>Home</title>
+</head>
+
+<body background="img/bg.jpg">
+
+    <div class="top">
+
+        <input type="checkbox" id="toggle-btn">
+        <label for="toggle-btn" class="show-menu-btn"><i class="fas fa-bars"></i></label>
+
+        <div class="nav">
+
+            <div class="logo">
+                <a href="index.html"><img src="img/logo.png" alt="Logo"></a>
+            </div>
+
+            <ul class="navigation">
+
+                <?php
+                if(!isset($_SESSION['username'])) {
+        ?>
+                <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Log In </a></li>
+                <li><a href="signup.html"><i class="fas fa-user-plus"></i> Sign-Up </a></li>
+                <li><a href="stories.html"><i class="fas fa-book-open"></i> Stories </a></li>
+                <li><a href="login.html"><i class="fas fa-pen-fancy"></i> Compose </a></li>
+
+                <?php
+            }
+            else{
+        ?>
+                <li><a href="profile.html?profile_url=<?php echo $user_data['profile_url'] ?>"><i class="fas fa-user"></i>
+                        <?php echo $user_data['username'] ?>
+                    </a></li>
+                <li><a href="compose.html"><i class="fas fa-pen-fancy"></i>Compose </a></li>
+                <li><a href="stories.html"><i class="fas fa-book-open"></i> Stories </a></li>
+                <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Log-Out </a></li>
+                <?php
+            }
+        ?>
+
+
+
+
+                <label for="toggle-btn" class="hide-menu-btn"><i class="fas fa-times"></i></label>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="categories">
+        Most read Stories
+    </div>
+
+    <div class="browse-content" id="results">
+
+
+        <?php 
+
+        $query = "SELECT story.*, user.username, user.profile_url FROM story INNER JOIN user ON story.user_id = user.user_id ORDER BY story.nr_of_accesses DESC limit 10"; 
+        
+        $result = mysqli_query($conn, $query);
+
+        while ($row = mysqli_fetch_array($result)) {
+
+        ?>
+        <div class="story-content">
+            <div class="story-image">
+                <a href="readStory.html?url=<?php echo $row['url']; ?>"> <img src="<?php echo $row['image_url'] ?>"></a>
+            </div>
+            <div class="story-details">
+
+                <div class="story-tile">
+                    <a href="readStory.html?url=<?php echo $row['url']; ?>" target="_blank">Title:
+                        <?php echo $row['title']; ?>
+                    </a>
+                </div>
+
+                <div class="story-author">
+                    Author:
+                    <!-- <?php echo $row['first_name'] . " " . $row['last_name']; ?> -->
+                    <a href="profile.html?profile_url=<?php echo $row['profile_url'] ?>"><?php echo $row['username'] ?></a>
+                </div>
+
+                <div class="number-of-views">
+                    <i class="fas fa-eye"></i>
+                    <?php echo $row['nr_of_accesses']; ?>
+                </div>
+
+                <div class="story-preview">
+                    Preview:
+                    <?php echo previewcheck($row['preview']); ?>
+                </div>
+
+                <div class="story-genre">
+                    Genre:
+                    <?php echo $row['genre'];?>
+                </div>
+
+            </div>
+
+        </div>
+        <?php 
+    } 
+        
+        ?>
+
+    </div>
+
+    <div class="categories">
+        Stories of 2022
+    </div>
+    <div class="story-slider">
+        <?php 
+
+        $query = "SELECT * FROM story WHERE publish_date BETWEEN '2022/01/01' AND '2022/12/31' ORDER BY title"; 
+        
+        $result = mysqli_query($conn, $query);
+
+        while ($row = mysqli_fetch_array($result)) {
+
+        ?>
+
+        <div class="slider-story-image">
+            <a href="readStory.html?url=<?php echo $row['url']; ?>"> <img src="<?php echo $row['image_url'] ?>"></a>
+        </div>
+
+        <?php
+     }
+     ?>
+
+    </div>
+
+
+    <div class="footer">
+        <div class="sociallinks">
+
+            <a href="#"><i class="fab fa-facebook-square" style="color: #3b5998;"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter" style="color: #00acee;"></i></a>
+
+        </div>
+
+        <ul>
+
+            <li><a href="#"> Terms </a></li>
+            <li><a href="#"> Privacy </a></li>
+            <li><a href="#"> Help </a></li>
+            <li><a href="#"> &copy 2021 </a></li>
+
+        </ul>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"
+        integrity="sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+
+
+        $('.story-slider').slick({
+            // dots: true,
+            accesibility:true,
+            arrows:true,
+            infinite: false,
+            speed: 300,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            prevArrow:"<button type='button' class='slide-arrow prev-arrow'><i class='fa fa-angle-left' aria-hidden='true'></i></button>",
+            nextArrow:"<button type='button' class='slide-arrow next-arrow'><i class='fa fa-angle-right' aria-hidden='true'></i></button>",
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3,
+                        slidesToScroll: 3,
+                        infinite: true,
+                        // dots: true
+                    }
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2
+                    }
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1
+                    }
+                }
+            ]
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<?php
+session_start();
+    include("php/functions.php");
+    include("php/connection.php");
+
+$_SESSION;
+
+$user_data = check_login($conn);
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/stories.css">
+    
+    <script src="js/scripts.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    
+    <title>Stories</title>
+</head>
+<body background="img/bg.jpg">
+    <div class="top">
+
+        <input type="checkbox" id="toggle-btn">
+        <label for="toggle-btn" class="show-menu-btn"><i class="fas fa-bars"></i></label>
+
+        <div class="nav">
+
+            <div class="logo">
+                <a href="index.html"><img src="img/logo.png" alt="Logo"></a>
+            </div>
+
+            <ul class="navigation">
+
+                <?php
+                if(!isset($_SESSION['username'])) {
+        ?>      
+                <li><a href="home.html"><i class="fas fa-house-damage"></i> Home </a></li>
+                <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Log In </a></li>
+                <li><a href="signup.html"><i class="fas fa-user-plus"></i> Sign-Up </a></li>
+                <li><a href="login.html"><i class="fas fa-pen-fancy"></i> Compose </a></li>
+
+                <?php
+            }
+            else{
+        ?>      
+                <li><a href="home.html"><i class="fas fa-house-damage"></i> Home </a></li>
+                <li><a href="profile.html?profile_url=<?php echo $user_data['profile_url']; ?>"><i class="fas fa-user"></i>
+                        <?php echo $user_data['username'] ?>
+                    </a></li>
+                <li><a href="compose.html"><i class="fas fa-pen-fancy"></i> Compose </a></li>
+                <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Log-Out </a></li>
+                <?php
+            }
+        ?>
+
+
+                <label for="toggle-btn" class="hide-menu-btn"><i class="fas fa-times"></i></label>
+            </ul>
+        </div>
+    </div>
+
+    <div class="genres-menu">
+
+        <!-- <form class="genres-container" method="POST" id="genrefilter">
+
+            <div class="row">
+
+                <button id= "b1"  name="genre" value="Novel"> Novel </button>
+                <button id= "b2"  name="genre" value="Science Fiction"> Science Fiction </button>
+                <button id= "b3"  name="genre" value="Romance"> Romance </button>
+                <button id= "b4"  name="genre" value="Fantasy"> Fantasy </button>
+                <button id= "b5"  name="genre" value="Paranormal"> Paranormal </button>
+                <button id= "b6"  name="genre" value="Mystery"> Mystery </button>
+                <button id= "b7"  name="genre" value="Adventure"> Adventure </button>
+                <button id= "b8"  name="genre" value="Thriller"> Thriller </button>
+                <button id= "b9"  name="genre" value="Drama"> Drama </button>
+                <button id= "b10" name="genre" value="Folklore"> Folklore </button>
+                
+                <div class="genre"> Novel </div>
+                <div class="genre"> Science Fiction </div>
+                <div class="genre"> Romance </div>
+                <div class="genre"> Fantasy </div>
+                <div class="genre"> Paranormal</div>
+                <div class="genre"> Mystery </div>
+                <div class="genre"> Adventure </div>  
+                <div class="genre"> Thriller </div> 
+                <div class="genre"> Drama </div>
+                <div class="genre"> Folklore </div>
+
+
+            </div>
+        </form> -->
+
+        <form class="genres-container-dropdown" method="post">
+            <div class="dropdown-row">
+
+                <label for="Genres" placeholder="Choose">Choose a genre:</label>
+
+                <select name="Genres" id="genres" onclick="filter_by_genre_dropdown()">
+                    
+                    <option selected="select">Select</option>
+                    <option value="All">All</option>
+                    <option value="Novel">Novel</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Science Fiction">Science Fiction</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Paranormal">Paranormal</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Folklore">Folklore</option>
+
+                </select>
+            </div>
+        </form>
+
+    </div>
+
+    <div class="browse-content" id="results">
+
+    </div>
+
+
+    <div class="footer">
+        <div class="sociallinks">
+
+            <a href="#"><i class="fab fa-facebook-square" style="color: #3b5998;"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter" style="color: #00acee;"></i></a>
+
+        </div>
+
+        <ul>
+
+            <li><a href="#"> Terms </a></li>
+            <li><a href="#"> Privacy </a></li>
+            <li><a href="#"> Help </a></li>
+            <li><a href="#"> &copy 2021 </a></li>
+
+        </ul>
+
+    </div>
+    <script>
+  
+//         const genreLookup = document.getElementById('genres');
+
+//         const resultsDiv = document.getElementById('results');
+
+//         filterbody.addEventListener('change', () => {
+//             const value = resultsDiv.value;
+//             fetch('http://localhost/ProiectWeb2/home.html?genre=',{value},'')
+//                 .then((response) => response.json())
+//                 .then(results => {
+//                     let resultsHTML = '<div class="browse-content" id> </div>';
+//                     results.forEach(item => {
+//                         resultsHTML += '<div class="story-image"> \
+//                             '; { item.cover_picture } '\
+//                      </div> \
+//                       \
+//                       <div class="story-details"> \
+// \
+//                               <div class="story-tile"> \
+//                                   <a href="#">Title: '; { item.title} '  </a>\
+//                               </div>\
+// \
+//                 <div class="story-author">\
+//                     Author: '; { item.first_name } ' '; { item.last_name } '\
+//                 </div>\
+// \
+//                 <div class="number-of-views">\
+//                     <i class="fas fa-eye"></i> '; { item.noa } '\
+//                 </div>\
+// \
+//                 < div class="story-preview" >\
+//                        Preview: '; { item.preview } '\
+//                 </div >\
+// \
+//                 <div class="story-genre">\
+//                          Genre: '; { item.preview } '\
+//                 </div>\
+// \
+//               </div > \
+//             ';
+
+//                     });
+//                 });
+
+//         })
+    </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<?php
+session_start();
+    include("php/functions.php");
+    include("php/connection.php");
+
+$_SESSION;
+
+$user_data = check_login($conn);
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link rel="stylesheet" href="css/nav.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/profile.css">
+
+
+
+    <title>Profile</title>
+</head>
+
+<body background="img/bg.jpg">
+
+
+
+    <div class="top">
+
+        <input type="checkbox" id="toggle-btn">
+        <label for="toggle-btn" class="show-menu-btn"><i class="fas fa-bars"></i></label>
+
+        <div class="nav">
+
+            <div class="logo">
+                <a href="index.html"><img src="img/logo.png" alt="Logo"></a>
+            </div>
+
+            <ul class="navigation">
+
+                <?php
+                if(!isset($_SESSION['username'])) {
+        ?>
+                <li><a href="home.html"><i class="fas fa-house-damage"></i> Home </a></li>
+                <li><a href="login.html"><i class="fas fa-sign-in-alt"></i> Log In </a></li>
+                <li><a href="signup.html"><i class="fas fa-user-plus"></i> Sign-Up </a></li>
+                <li><a href="stories.html"><i class="fas fa-book-open"></i> Stories </a></li>
+                <li><a href="login.html"><i class="fas fa-pen-fancy"></i> Compose </a></li>
+
+                <?php
+            }
+            else{
+        ?>
+                <li><a href="home.html"><i class="fas fa-house-damage"></i> Home </a></li>
+                <li><a href="profile.html?profile_url=<?php echo $user_data['profile_url'] ?>"><i
+                            class="fas fa-user"></i>
+                        <?php echo $user_data['username'] ?>
+                    </a></li>
+                <li><a href="compose.html"><i class="fas fa-pen-fancy"></i>Compose </a></li>
+                <li><a href="stories.html"><i class="fas fa-book-open"></i> Stories </a></li>
+                <li><a href="php/logout.php"><i class="fas fa-sign-out-alt"></i> Log-Out </a></li>
+                <?php
+            }
+        ?>
+
+
+
+
+                <label for="toggle-btn" class="hide-menu-btn"><i class="fas fa-times"></i></label>
+            </ul>
+        </div>
+    </div>
+
+    <div class="profile-wrapper">
+
+        <div class="user-data">
+            <?php 
+            $profileURL = $_GET['profile_url'];
+            
+            $query = "SELECT *  FROM user WHERE user.profile_url = '$profileURL'"; 
+            
+            $result = mysqli_query($conn, $query);
+            
+            while ($row = mysqli_fetch_array($result)) {
+            
+            ?>
+
+            <div class="user-username">
+                Username:
+                <?php echo $row['username']; ?>
+
+            </div>
+
+            <div class="user-firstname-lastname">
+                User's Name:
+                <?php echo $row['first_name'] . " " . $row['last_name'];?>
+            </div>
+            <?php
+        
+        ?>
+        </div>
+
+        <div class="categories">
+            Stories written by
+            <?php echo $row['username']; 
+        }
+        ?>
+        </div>
+
+
+        <?php 
+            $profileURL = $_GET['profile_url'];
+            
+            $query = "SELECT story.*, user.* FROM story INNER JOIN user ON story.user_id = user.user_id WHERE user.profile_url = '$profileURL'"; 
+            
+            $result = mysqli_query($conn, $query);
+            
+            if(mysqli_num_rows($result)>0){
+            while ($row = mysqli_fetch_array($result)) {
+            
+            ?>
+
+        <div class="story-content">
+            <div class="story-image">
+                <a href="readStory.html?url=<?php echo $row['url']; ?>"> <img src="<?php echo $row['image_url'] ?>"></a>
+            </div>
+            <div class="story-details">
+
+                <div class="story-tile">
+                    <a href="readStory.html?url=<?php echo $row['url']; ?>" target="_blank">Title:
+                        <?php echo $row['title']; ?>
+                    </a>
+                </div>
+
+                <div class="story-author">
+                    Author:
+                    <!-- <?php echo $row['first_name'] . " " . $row['last_name']; ?> -->
+                    <a href="profile.html?profile_url=<?php echo $row['profile_url'] ?>">
+                        <?php echo $row['username']; ?>
+                    </a>
+                </div>
+
+                <div class="number-of-views">
+                    <i class="fas fa-eye"></i>
+                    <?php echo $row['nr_of_accesses']; ?>
+                </div>
+
+                <div class="story-preview">
+                    Preview:
+                    <?php echo previewcheck($row['preview']); ?>
+                </div>
+
+                <div class="story-genre">
+                    Genre:
+                    <?php echo $row['genre'];?>
+                </div>
+
+            </div>
+
+        </div>
+        <?php 
+            }
+            }else{
+            ?>
+        <div class="empty">
+            <p> You haven't written any story</p>
+            <i class="fas fa-frown"></i>
+        </div>
+        <?php
+            }
+         ?>
+
+
+        <!-- /////////////////////////////////////////////////// Saved stories //////////////////////////////////////////////////// -->
+
+        <?php 
+        $profileURL = $_GET['profile_url'];
+
+        $query = "SELECT favourite.user_id AS fav_stories_user_id, favourite.story_id AS fav_stories_story_id, user.user_id AS user_user_id, 
+        user.first_name, user.last_name, user.username, user.profile_url, story.story_id AS story_story_id, story.user_id AS story_user_id, 
+        story.user_id as story_username, story.publish_date, story.preview, story.genre, story.title, story.url, story.image_url, 
+        story.nr_of_accesses FROM user INNER JOIN (story INNER JOIN favourite ON story.story_id = favourite.story_id) ON user.user_id = favourite.user_id
+        WHERE user.profile_url='$profileURL'"; 
+            
+            $result1 = mysqli_query($conn, $query);
+            $result2 = mysqli_query($conn, $query);
+
+            $row1 = mysqli_fetch_array($result1); 
+
+
+            if(isset($_SESSION['username']) ){
+                if(mysqli_num_rows($result1) > 0){
+                    if($_SESSION['username'] == $row1['username']){ 
+            ?>
+
+        <div class="categories">
+            Stories saved by
+            <?php      
+    
+                $pfurl = $row1['profile_url'];
+                $query2 = "SELECT username FROM user where profile_url = '$pfurl'";
+                $result3 = mysqli_query($conn, $query2);
+               
+                $row2 = mysqli_fetch_array($result3);
+                echo $row2['username']; 
+                ?>
+        </div>
+
+        <?php
+                while ($row3 = mysqli_fetch_array($result2)) {
+    
+                ?>
+
+        <div class="story-content">
+            <div class="story-image">
+                <a href="readStory.html?url=<?php echo $row3['url']; ?>"> <img
+                        src="<?php echo $row3['image_url'] ?>"></a>
+            </div>
+            <div class="story-details">
+
+                <div class="story-tile">
+                    <a href="readStory.html?url=<?php echo $row3['url']; ?>" target="_blank">Title:
+                        <?php echo $row3['title']; ?>
+                    </a>
+                </div>
+
+                <div class="story-author">
+                    <?php 
+    
+                    $usnm = $row3['story_username'];
+                    $query3 = "SELECT username, profile_url FROM user where user_id = '$usnm'";
+                    $result3 = mysqli_query($conn, $query3);
+                   
+                    $row4 = mysqli_fetch_array($result3); 
+                     ?>
+                    <a href="profile.html?profile_url=<?php echo $row4['profile_url'] ?>"> Author:
+                        <?php echo $row4['username']; ?>
+                    </a>
+                </div>
+
+                <div class="number-of-views">
+                    <i class="fas fa-eye"></i>
+                    <?php echo $row3['nr_of_accesses']; ?>
+                </div>
+
+                <div class="story-preview">
+                    Preview:
+                    <?php echo previewcheck($row3['preview']); ?>
+                </div>
+
+                <div class="story-genre">
+                    Genre:
+                    <?php echo $row3['genre'];?>
+                </div>
+
+            </div>
+
+        </div>
+        <?php
+         }
+         }else{
+             ?>
+        <div class="categories-hidden">
+            asdasdasdas
+        </div>
+        <?php
+            }
+         }else{
+             ?>
+        <div class="categories">
+            Stories saved by
+            <?php      
+        
+                    $pfurl = $_GET['profile_url'];
+                    $query2 = "SELECT username FROM user where profile_url = '$pfurl'";
+                    $result3 = mysqli_query($conn, $query2);
+                   
+                    $row2 = mysqli_fetch_array($result3);
+                    echo $row2['username']; 
+                    ?>
+        </div>
+        <div class="empty">
+            <p> You haven't written any story</p>
+            <i class="fas fa-frown"></i>
+        </div>
+
+        <?php
+         }
+        }
+        ?>
+
+    </div>
+
+
+
+
+
+
+    <div class="footer">
+        <div class="sociallinks">
+
+            <a href="#"><i class="fab fa-facebook-square" style="color: #3b5998;"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter" style="color: #00acee;"></i></a>
+
+        </div>
+
+        <ul>
+
+            <li><a href="#"> Terms </a></li>
+            <li><a href="#"> Privacy </a></li>
+            <li><a href="#"> Help </a></li>
+            <li><a href="#"> &copy 2021 </a></li>
+
+        </ul>
+
+    </div>
+</body>
+
+</html>

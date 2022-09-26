@@ -1,0 +1,180 @@
+@import url("https://use.fontawesome.com/releases/v5.10.2/css/all.css");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.top {
+    top: 0;
+    position: fixed;
+    width: 100%;
+    /* float: left; */
+    background: #2832c2;
+    padding: 0 10px;
+    color: #fff;
+    margin-bottom: auto;
+}
+
+
+/* nav {
+    display: flex;
+    justify-content: center;
+}  */
+
+.logo {
+    max-width: 250px;
+    float: left;
+    padding: 7px 0 0 0;
+}
+
+.logo img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.navigation {
+    margin: 0;
+    float: right;
+    /* position: relative; */
+}
+
+.navigation ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.navigation li {
+    list-style: none;
+    float: left;
+}
+
+.navigation li a {
+    color: #28c2b8;
+    padding: 10px 15px;
+    text-transform: uppercase;
+    text-align: center;
+    display: block;
+    text-decoration: none;
+}
+
+.navigation li:hover {
+    background-color: rgba(161, 142, 142, 0.411);
+
+}
+
+.navigation li a i {
+    width: 100%;
+    font-size: 20px;
+    margin-bottom: 7px;
+}
+
+.show-menu-btn,
+.hide-menu-btn {
+    transition: 0.2s;
+    font-size: 30px;
+    cursor: pointer;
+    display: none;
+}
+
+.show-menu-btn {
+    margin: 0px;
+    float: right;
+}
+
+.show-menu-btn i {
+    line-height: 80px;
+}
+
+.navigation a:hover,
+.show-menu-btn:hover,
+.hide-menu-btn:hover {
+    color: black;
+}
+
+#toggle-btn {
+    position: absolute;
+    visibility: hidden;
+    z-index: -1111;
+}
+
+@media screen and (max-width:850px) {
+
+    .show-menu-btn,
+    .hide-menu-btn {
+        display: flex;
+        transition: 1s;
+    }
+
+    .nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .logo {
+        max-width: 250px;
+        float: left;
+        padding: 10px 0px;
+    }
+
+    .logo img {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 10%;
+
+    }
+
+
+    .top {
+        top: 0;
+        position: fixed;
+        width: 100%;
+        background: #2832c2;
+        padding: 0 10px;
+        color: #fff;
+        /* margin-bottom: 5%; */
+    }
+
+    .navigation {
+        position: fixed;
+        display: none;
+        width: 100%;
+        /* --inaltime: calc(100%-var(height:auto;)); */
+        background: #626beb;
+        left: 0;
+        padding: 20px 0px;
+        transition: 1s;
+    }
+
+    .navigation li {
+        width: 100%;
+    }
+
+    .navigation li a {
+        color: #eba462;
+        padding: 10px 10px;
+        text-align: center;
+    }
+
+    .navigation li a i {
+        width: auto;
+        font-size: 20px;
+    }
+
+    .hide-menu-btn {
+        position: absolute;
+        top: 10px;
+        right: 13px;
+
+    }
+
+    #toggle-btn:checked~.nav .navigation {
+        display: block;
+        transform: translateY(65%);
+    }
+
+}
